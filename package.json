@@ -10,8 +10,7 @@
     "/ios",
     "/src",
     "/lib",
-    "/*.podspec",
-    "react-native.config.js"
+    "/*.podspec"
   ],
   "scripts": {
     "test": "jest",

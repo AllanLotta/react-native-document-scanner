@@ -1,14 +1,14 @@
 import React from 'react'
 import {
   DeviceEventEmitter,
-  findNodeHandle,
   NativeModules,
   Platform,
   requireNativeComponent,
-  ViewStyle } from 'react-native'
+  ViewStyle
+} from 'react-native'
 
 const RNPdfScanner = requireNativeComponent('RNPdfScanner')
-const ScannerManager: any = NativeModules.RNPdfScannerManager
+const CameraManager = NativeModules.RNPdfScannerManager || {}
 
 export interface PictureTaken {
   rectangleCoordinates?: object;
@@ -47,15 +47,11 @@ interface PdfScannerProps {
   brightness?: number;
   contrast?: number;
   detectionCountBeforeCapture?: number;
-  durationBetweenCaptures?: number;
   detectionRefreshRateInMS?: number;
   documentAnimation?: boolean;
   noGrayScale?: boolean;
   manualOnly?: boolean;
   style?: ViewStyle;
-  useBase64?: boolean;
-  saveInAppDocument?: boolean;
-  captureMultiple?: boolean;
 }
 
 class PdfScanner extends React.Component<PdfScannerProps> {
@@ -76,28 +72,11 @@ class PdfScanner extends React.Component<PdfScannerProps> {
     return this.props.quality
   }
 
-  componentDidMount () {
+  componentWillMount () {
     if (Platform.OS === 'android') {
       const { onPictureTaken, onProcessing } = this.props
       if (onPictureTaken) DeviceEventEmitter.addListener('onPictureTaken', onPictureTaken)
       if (onProcessing) DeviceEventEmitter.addListener('onProcessingChange', onProcessing)
-    }
-  }
-
-  componentDidUpdate(prevProps: PdfScannerProps) {
-    if (Platform.OS === 'android') {
-      if (this.props.onPictureTaken !== prevProps.onPictureTaken) {
-        if (prevProps.onPictureTaken)
-          DeviceEventEmitter.removeListener('onPictureTaken', prevProps.onPictureTaken)
-        if (this.props.onPictureTaken)
-          DeviceEventEmitter.addListener('onPictureTaken', this.props.onPictureTaken)
-      }
-      if (this.props.onProcessing !== prevProps.onProcessing) {
-        if (prevProps.onProcessing)
-          DeviceEventEmitter.removeListener('onProcessingChange', prevProps.onProcessing)
-        if (this.props.onProcessing)
-          DeviceEventEmitter.addListener('onProcessingChange', this.props.onProcessing)
-      }
     }
   }
 
@@ -110,27 +89,12 @@ class PdfScanner extends React.Component<PdfScannerProps> {
   }
 
   capture () {
-    if (this._scannerHandle) {
-      ScannerManager.capture(this._scannerHandle)
-    }
+    CameraManager.capture()
   }
-
-  _scannerRef: any = null;
-  _scannerHandle: number | null = null;
-  _setReference = (ref: any) => {
-    if (ref) {
-      this._scannerRef = ref
-      this._scannerHandle = findNodeHandle(ref)
-    } else {
-      this._scannerRef = null
-      this._scannerHandle = null
-    }
-  };
 
   render () {
     return (
       <RNPdfScanner
-        ref={this._setReference}
         {...this.props}
         onPictureTaken={this.sendOnPictureTakenEvent.bind(this)}
         onRectangleDetect={this.sendOnRectangleDetectEvent.bind(this)}
@@ -140,7 +104,6 @@ class PdfScanner extends React.Component<PdfScannerProps> {
         contrast={this.props.contrast || 1}
         quality={this.getImageQuality()}
         detectionCountBeforeCapture={this.props.detectionCountBeforeCapture || 5}
-        durationBetweenCaptures={this.props.durationBetweenCaptures || 0}
         detectionRefreshRateInMS={this.props.detectionRefreshRateInMS || 50}
       />
     )

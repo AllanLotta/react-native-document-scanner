@@ -10,6 +10,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Created by andre on 28/11/2017.
+ */
+
 public class DocumentScannerPackage implements ReactPackage {
 
 
@@ -20,7 +24,7 @@ public class DocumentScannerPackage implements ReactPackage {
         );
     }
 
-    // Deprecated in RN 0.47
+    @Override
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }

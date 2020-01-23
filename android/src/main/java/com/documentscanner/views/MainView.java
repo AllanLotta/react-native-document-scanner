@@ -14,7 +14,17 @@ import com.documentscanner.R;
 public class MainView extends FrameLayout {
     private OpenNoteCameraView view;
 
-    public MainView(Context context, Activity activity) {
+    public static MainView instance = null;
+
+    public static MainView getInstance() {
+        return instance;
+    }
+
+    public static void createInstance(Context context, Activity activity) {
+        instance = new MainView(context, activity);
+    }
+
+    private MainView(Context context, Activity activity) {
         super(context);
 
         LayoutInflater lf = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -34,10 +44,6 @@ public class MainView extends FrameLayout {
 
     public void setDetectionCountBeforeCapture(int numberOfRectangles) {
         view.setDetectionCountBeforeCapture(numberOfRectangles);
-    }
-
-    public void setDurationBetweenCaptures(double durationBetweenCaptures) {
-        view.setDurationBetweenCaptures(durationBetweenCaptures);
     }
 
     public void setEnableTorch(boolean enable) {
